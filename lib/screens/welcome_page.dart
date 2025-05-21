@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/widgets/white_text.dart';
-import 'package:meals_recipes/screens/home_page.dart';
 
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
@@ -67,15 +67,7 @@ class WelcomePage extends StatelessWidget {
                       ),
                     ),
                     ElevatedButton(
-                      onPressed:
-                          () => {
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => const HomePage(),
-                              ),
-                            ),
-                          },
+                      onPressed: () => {context.go('/home')},
                       style: ElevatedButton.styleFrom(
                         backgroundColor: mainColor,
                         padding: EdgeInsets.symmetric(

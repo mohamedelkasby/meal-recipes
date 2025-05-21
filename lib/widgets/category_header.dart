@@ -14,7 +14,7 @@ Widget categoryHeader({
         Row(
           children: [
             Text(
-              title.capitalizeByWord(),
+              title.capitalizeFirstLetter(),
               style: TextStyle(
                 fontSize: 25,
                 fontVariations: [FontVariation('wght', 700)],
