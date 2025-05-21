@@ -5,10 +5,22 @@ import 'package:meals_recipes/extention/extentions.dart';
 import 'package:meals_recipes/services/models/recipes_model.dart';
 import 'package:meals_recipes/widgets/expandable_text.dart';
 
-class RecipeInformation extends StatelessWidget {
+class RecipeInformation extends StatefulWidget {
   const RecipeInformation({super.key, required this.recipesModel});
 
   final RecipesModel recipesModel;
+
+  @override
+  State<RecipeInformation> createState() => _RecipeInformationState();
+}
+
+class _RecipeInformationState extends State<RecipeInformation> {
+  late int servings;
+  @override
+  void initState() {
+    servings = widget.recipesModel.servings;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -31,7 +43,7 @@ class RecipeInformation extends StatelessWidget {
             width: double.infinity,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: NetworkImage(recipesModel.imageUrl),
+                image: NetworkImage(widget.recipesModel.imageUrl),
                 fit: BoxFit.cover,
               ),
             ),
@@ -111,8 +123,67 @@ class RecipeInformation extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                if (widget.recipesModel.healthy)
+                                  Row(
+                                    children: [
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.green,
+                                        ),
+                                        child: const Icon(
+                                          Icons.check,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        "healthy".capitalizeFirstLetter(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                if (widget.recipesModel.favorite)
+                                  Row(
+                                    children: [
+                                      const SizedBox(width: 20),
+                                      Container(
+                                        width: 30,
+                                        height: 30,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          color: Colors.red,
+                                        ),
+                                        child: const Icon(
+                                          Icons.favorite,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 10),
+                                      Text(
+                                        "popular".capitalizeFirstLetter(),
+                                        style: const TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
                             Text(
-                              recipesModel.title,
+                              widget.recipesModel.title,
                               style: const TextStyle(
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold,
@@ -130,7 +201,7 @@ class RecipeInformation extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      '${recipesModel.cookingTime} mins',
+                                      '${widget.recipesModel.cookingTime} mins',
                                       style: const TextStyle(
                                         fontSize: 17,
                                         color: Colors.grey,
@@ -147,7 +218,7 @@ class RecipeInformation extends StatelessWidget {
                                     ),
                                     const SizedBox(width: 5),
                                     Text(
-                                      '${recipesModel.servings} servings',
+                                      '${widget.recipesModel.servings} servings',
                                       style: const TextStyle(
                                         fontSize: 17,
                                         color: Colors.grey,
@@ -158,6 +229,30 @@ class RecipeInformation extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 15),
+                            Text(
+                              "diets".capitalizeFirstLetter(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Container(
+                              padding: const EdgeInsets.all(5),
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: Text(
+                                widget.recipesModel.diets.join(', '),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
 
                             Text(
                               "description".capitalizeFirstLetter(),
@@ -171,7 +266,9 @@ class RecipeInformation extends StatelessWidget {
 
                             ExpandableText(
                               text:
-                                  parse(recipesModel.description).body?.text ??
+                                  parse(
+                                    widget.recipesModel.description,
+                                  ).body?.text ??
                                   '',
                               style: const TextStyle(
                                 fontSize: 16,
@@ -179,6 +276,52 @@ class RecipeInformation extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 20),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  "Serving".capitalizeFirstLetter(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                SizedBox(width: 20),
+                                Text(
+                                  "(   ${servings.toString()}   )",
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                const SizedBox(width: 20),
+                                Row(
+                                  children: [
+                                    IconButton(
+                                      icon: const Icon(Icons.add),
+                                      onPressed: () {
+                                        setState(() {
+                                          servings++;
+                                        });
+                                      },
+                                    ),
+                                    IconButton(
+                                      icon: const Icon(Icons.remove),
+                                      onPressed: () {
+                                        setState(() {
+                                          if (servings > 1) {
+                                            servings--;
+                                          }
+                                        });
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+
                             Text(
                               "ingredients".capitalizeFirstLetter(),
                               style: const TextStyle(
@@ -190,60 +333,65 @@ class RecipeInformation extends StatelessWidget {
                             ListView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: recipesModel.ingredients.length,
+                              itemCount: widget.recipesModel.ingredients.length,
 
                               itemBuilder: (context, index) {
-                                return Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Container(
-                                          width: 80,
-                                          height: 80,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                              image: NetworkImage(
-                                                'https://spoonacular.com/cdn/ingredients_100x100/${recipesModel.ingredients[index].image}',
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 5),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Row(
+                                        children: [
+                                          Container(
+                                            width: 80,
+                                            height: 80,
+                                            decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  'https://spoonacular.com/cdn/ingredients_100x100/${widget.recipesModel.ingredients[index].image}',
+                                                ),
                                               ),
                                             ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 22),
-                                        Text(
-                                          recipesModel
-                                              .ingredients[index]
-                                              .originalName,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
+                                          const SizedBox(width: 15),
+                                          Text(
+                                            widget
+                                                .recipesModel
+                                                .ingredients[index]
+                                                .originalName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                    Row(
-                                      children: [
-                                        Text(
-                                          recipesModel
-                                              .ingredients[index]
-                                              .amount,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Text(
+                                            "${((double.parse(widget.recipesModel.ingredients[index].amount)) / (widget.recipesModel.servings) * servings).formatted} ",
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                        const SizedBox(width: 5),
-                                        Text(
-                                          recipesModel.ingredients[index].unit,
-                                          style: const TextStyle(
-                                            fontSize: 16,
-                                            color: Colors.black,
+                                          const SizedBox(width: 5),
+                                          Text(
+                                            widget
+                                                .recipesModel
+                                                .ingredients[index]
+                                                .unit,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              color: Colors.black,
+                                            ),
                                           ),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
+                                        ],
+                                      ),
+                                    ],
+                                  ),
                                 );
                               },
                             ),

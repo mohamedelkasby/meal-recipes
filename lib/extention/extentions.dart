@@ -17,3 +17,18 @@ extension CapitalizeByWord on String {
         .join(' ');
   }
 }
+
+extension NumFormatter on num {
+  String get formatted {
+    String str = toString();
+    List<String> parts = str.split('.');
+    if (parts.length > 1) {
+      // Remove trailing zeros from the decimal part
+      String trimmedDecimal = parts[1].replaceAll(RegExp(r'0+$'), '');
+      return trimmedDecimal.isEmpty
+          ? parts[0] // No decimal part needed
+          : '${parts[0]}.$trimmedDecimal'; // Keep non-zero decimals
+    }
+    return str; // Already an integer
+  }
+}
