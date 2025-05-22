@@ -8,6 +8,8 @@ final class SearchLoading extends SearchState {}
 
 final class SearchSuccess extends SearchState {}
 
+final class CloseSearch extends SearchState {}
+
 final class SearchFauiler extends SearchState {
   final String errorMessage;
   SearchFauiler({required this.errorMessage});

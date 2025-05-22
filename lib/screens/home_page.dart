@@ -4,7 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/extention/extentions.dart';
 import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
-import 'package:meals_recipes/services/cubit/search_cubit/search_cubit.dart';
+import 'package:meals_recipes/widgets/search_bar.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -46,7 +46,7 @@ class HomePage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 25),
-                          SearchWidget(),
+                          SearchBarWidget(),
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 20),
                             child: Text(
@@ -524,127 +524,3 @@ class Categories extends StatelessWidget {
     );
   }
 }
-
-class SearchWidget extends StatefulWidget {
-  const SearchWidget({super.key});
-
-  @override
-  State<SearchWidget> createState() => _SearchWidgetState();
-}
-
-class _SearchWidgetState extends State<SearchWidget> {
-  final FocusNode _focusNode = FocusNode();
-  final TextEditingController _controller = TextEditingController();
-  bool _showSuggestions = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_handleFocusChange);
-  }
-
-  void _handleFocusChange() {
-    setState(() {
-      _showSuggestions = _focusNode.hasFocus || _controller.text.isNotEmpty;
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.removeListener(_handleFocusChange);
-    _focusNode.dispose();
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        BlocBuilder<SearchCubit, SearchState>(
-          builder: (context, state) {
-            return TextFormField(
-              controller: _controller,
-              focusNode: _focusNode,
-              autofocus: true,
-              onChanged: (value) {
-                BlocProvider.of<SearchCubit>(
-                  context,
-                ).searchRecipes(search: value);
-                setState(() {
-                  _showSuggestions = value.isNotEmpty;
-                });
-              },
-              decoration: InputDecoration(
-                // Your existing decoration properties
-              ),
-            );
-          },
-        ),
-        if (_showSuggestions)
-          Container(
-            height: 200, // Adjust height as needed
-            margin: const EdgeInsets.only(top: 8),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(10),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black12,
-                  blurRadius: 6,
-                  offset: Offset(0, 2),
-                ),
-              ],
-            ),
-            child: ListView(
-              children: [
-                // Add your search suggestions here
-                // Example:
-                // ...state.suggestions.map((suggestion) => ListTile(...)),
-              ],
-            ),
-          ),
-      ],
-    );
-  }
-}
-// class SearchWidget extends StatelessWidget {
-//   const SearchWidget({super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return BlocBuilder<SearchCubit, SearchState>(
-//       builder: (context, state) {
-//         return TextFormField(
-//           autofocus: true,
-//           focusNode: FocusNode(),
-//           onChanged: (value) {
-//             BlocProvider.of<SearchCubit>(context).searchRecipes(search: value);
-//           },
-//           keyboardType: TextInputType.text,
-//           decoration: InputDecoration(
-//             prefixIcon: Icon(Icons.search, color: greyColor),
-//             hintText: "Search recipes",
-//             hintStyle: TextStyle(
-//               fontSize: 16,
-//               fontVariations: [FontVariation('wght', 400)],
-//               color: Colors.grey,
-//             ),
-//             border: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//               borderSide: BorderSide(),
-//             ),
-//             enabledBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//               borderSide: BorderSide(color: greyColor, width: 2),
-//             ),
-//             focusedBorder: OutlineInputBorder(
-//               borderRadius: BorderRadius.circular(10),
-//               borderSide: BorderSide(color: darkmainColor, width: 2),
-//             ),
-//           ),
-//         );
-//       },
-//     );
-//   }
-// }

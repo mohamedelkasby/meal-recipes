@@ -146,7 +146,7 @@ class RecipesServices {
         for (var recipe in jsonData['results']) {
           searchResults.add({
             'id': recipe['id'],
-            'imageUrl': recipe['image'],
+            'image': recipe['image'],
             'title': recipe['title'],
           });
         }
