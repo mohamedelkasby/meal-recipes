@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:meals_recipes/screens/all_recipes.dart';
 import 'package:meals_recipes/screens/home_page.dart';
 import 'package:meals_recipes/screens/recipe_information.dart';
 import 'package:meals_recipes/screens/welcome_page.dart';
@@ -23,6 +24,13 @@ final GoRouter routes = GoRouter(
         // Extract the RecipesModel from the state extra
         final RecipesModel recipesModel = state.extra as RecipesModel;
         return RecipeInformation(recipesModel: recipesModel);
+      },
+    ),
+    GoRoute(
+      path: '/allRecipes',
+      builder: (context, state) {
+        // Extract the RecipesModel from the state extra
+        return AllRecipes();
       },
     ),
   ],

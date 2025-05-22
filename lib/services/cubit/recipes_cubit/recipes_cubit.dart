@@ -7,10 +7,29 @@ part 'recipes_state.dart';
 class RecipesCubit extends Cubit<RecipesState> {
   RecipesCubit() : super(RecipesInitial()) {
     getAllRecipes();
+    getRandomRecipes();
   }
 
   List<RecipesModel> allRecipes = [];
   List<String> categories = [];
+  List<Map<String, dynamic>> searchResults = [];
+
+  RecipesModel randomRecipe = RecipesModel(
+    id: 0,
+    title: '',
+    imageUrl: '',
+    description: '',
+    cookingTime: "0",
+    readyInMinutes: "0",
+    ingredients: [],
+    steps: [],
+    servings: 0,
+    diets: [],
+    dishType: [],
+    equipment: [],
+    favorite: false,
+    healthy: false,
+  );
 
   Future<void> getAllRecipes() async {
     emit(RecipesLoading());
@@ -28,6 +47,17 @@ class RecipesCubit extends Cubit<RecipesState> {
     }
     categories = categories.toSet().toList();
     emit(Recipescategorysuccess());
-    print(categories);
+    // print(categories);
+  }
+
+  Future<void> getRandomRecipes() async {
+    emit(RecipesLoading());
+    try {
+      randomRecipe = await RecipesServices().fetchRandomRecipe();
+      // emit(RecipesSuccess());
+      print(randomRecipe);
+    } on Exception catch (e) {
+      emit(RecipesFauiler(errorMessage: e.toString()));
+    }
   }
 }

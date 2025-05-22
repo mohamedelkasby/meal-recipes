@@ -32,6 +32,55 @@ class RecipesServices {
     }
   }
 
+  Future<RecipesModel> fetchRandomRecipe() async {
+    try {
+      http.Response response = await http.get(Uri.parse(randomRecipesUrl));
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        RecipesModel recipesModel = RecipesModel.fromJson(
+          jsonData['recipes'][0],
+        );
+        return recipesModel;
+      } else {
+        print('Failed to load random recipe${response.statusCode}');
+        return RecipesModel(
+          id: 0,
+          title: '',
+          imageUrl: '',
+          description: '',
+          cookingTime: "0",
+          readyInMinutes: "0",
+          ingredients: [],
+          steps: [],
+          servings: 0,
+          diets: [],
+          dishType: [],
+          equipment: [],
+          favorite: false,
+          healthy: false,
+        );
+      }
+    } on Exception catch (e) {
+      print('Error: $e');
+      return RecipesModel(
+        id: 0,
+        title: '',
+        imageUrl: '',
+        description: '',
+        cookingTime: "0",
+        readyInMinutes: "0",
+        ingredients: [],
+        steps: [],
+        servings: 0,
+        diets: [],
+        dishType: [],
+        equipment: [],
+        favorite: false,
+        healthy: false,
+      );
+    }
+  }
+
   Future<RecipesModel> fetchRecipeById({required id}) async {
     try {
       http.Response response = await http.get(
@@ -78,6 +127,37 @@ class RecipesServices {
         favorite: false,
         healthy: false,
       );
+    }
+  }
+
+  Future<List<Map<String, dynamic>>> searchRecipes({
+    required String query,
+  }) async {
+    try {
+      http.Response response = await http.get(
+        Uri.parse(
+          'https://api.spoonacular.com/recipes/complexSearch?query=$query&number=5&apiKey=$apikey',
+        ),
+      );
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<Map<String, dynamic>> searchResults = [];
+
+        for (var recipe in jsonData['results']) {
+          searchResults.add({
+            'id': recipe['id'],
+            'imageUrl': recipe['image'],
+            'title': recipe['title'],
+          });
+        }
+        return searchResults;
+      } else {
+        print('Failed to load search results${response.statusCode}');
+        return [];
+      }
+    } catch (e) {
+      print('Error: $e');
+      return [];
     }
   }
 }

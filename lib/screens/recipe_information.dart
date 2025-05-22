@@ -25,17 +25,6 @@ class _RecipeInformationState extends State<RecipeInformation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // appBar: AppBar(
-      //   title: const Text('Recipe Information'),
-      //   centerTitle: true,
-      //   backgroundColor: mainColor,
-      //   leading: IconButton(
-      //     icon: const Icon(Icons.arrow_back),
-      //     onPressed: () {
-      //       Navigator.pop(context);
-      //     },
-      //   ),
-      // ),
       body: Stack(
         children: [
           Container(
@@ -299,28 +288,50 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                 const SizedBox(width: 20),
                                 Row(
                                   children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.add),
-                                      onPressed: () {
-                                        setState(() {
-                                          servings++;
-                                        });
-                                      },
+                                    Container(
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: Colors.green,
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.add,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            servings++;
+                                          });
+                                        },
+                                      ),
                                     ),
-                                    IconButton(
-                                      icon: const Icon(Icons.remove),
-                                      onPressed: () {
-                                        setState(() {
-                                          if (servings > 1) {
-                                            servings--;
-                                          }
-                                        });
-                                      },
+                                    const SizedBox(width: 10),
+                                    Container(
+                                      width: 40,
+                                      decoration: BoxDecoration(
+                                        shape: BoxShape.circle,
+                                        color: mainColor,
+                                      ),
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Icons.remove,
+                                          color: Colors.white,
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            if (servings > 1) {
+                                              servings--;
+                                            }
+                                          });
+                                        },
+                                      ),
                                     ),
                                   ],
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 20),
 
                             Text(
                               "ingredients".capitalizeFirstLetter(),
@@ -360,7 +371,8 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                             widget
                                                 .recipesModel
                                                 .ingredients[index]
-                                                .originalName,
+                                                .originalName
+                                                .capitalizeByWord(),
                                             style: const TextStyle(
                                               fontSize: 16,
                                               color: Colors.black,
@@ -391,6 +403,69 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                         ],
                                       ),
                                     ],
+                                  ),
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 20),
+                            Text(
+                              "equipment".capitalizeFirstLetter(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: widget.recipesModel.equipment.length,
+                              itemBuilder: (context, index) {
+                                return Row(
+                                  children: [
+                                    Container(
+                                      width: 90,
+                                      height: 90,
+                                      decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            '${widget.recipesModel.equipment[index].image}',
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 15),
+                                    Text(
+                                      widget.recipesModel.equipment[index].name
+                                          .capitalizeByWord(),
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            Text(
+                              "steps".capitalizeFirstLetter(),
+                              style: const TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            ListView.builder(
+                              physics: const NeverScrollableScrollPhysics(),
+                              shrinkWrap: true,
+                              itemCount: widget.recipesModel.steps.length,
+                              itemBuilder: (context, index) {
+                                return Text(
+                                  "${index + 1} - ${widget.recipesModel.steps[index].description}",
+                                  style: const TextStyle(
+                                    fontSize: 16,
+                                    color: Colors.black,
                                   ),
                                 );
                               },

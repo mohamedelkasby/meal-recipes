@@ -20,7 +20,7 @@ extension CapitalizeByWord on String {
 
 extension NumFormatter on num {
   String get formatted {
-    String str = toString();
+    String str = toStringAsFixed(3);
     List<String> parts = str.split('.');
     if (parts.length > 1) {
       // Remove trailing zeros from the decimal part
@@ -29,6 +29,6 @@ extension NumFormatter on num {
           ? parts[0] // No decimal part needed
           : '${parts[0]}.$trimmedDecimal'; // Keep non-zero decimals
     }
-    return str; // Already an integer
+    return str;
   }
 }

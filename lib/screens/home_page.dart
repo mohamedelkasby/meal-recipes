@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/extention/extentions.dart';
-import 'package:meals_recipes/services/cubit/recipes_cubit.dart';
-import 'package:meals_recipes/widgets/category_header.dart';
+import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
+import 'package:meals_recipes/services/cubit/search_cubit/search_cubit.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -14,7 +14,6 @@ class HomePage extends StatelessWidget {
     return BlocConsumer<RecipesCubit, RecipesState>(
       listener: (context, state) {
         if (state is RecipesSuccess) {
-          print("==========> $state <============");
           BlocProvider.of<RecipesCubit>(context).getCategoryRecipes();
         }
       },
@@ -22,121 +21,321 @@ class HomePage extends StatelessWidget {
         return Scaffold(
           body: Padding(
             padding: const EdgeInsets.fromLTRB(8, 30, 8, 0),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Find best recipes\nfor cooking",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontVariations: [FontVariation('wght', 700)],
-                    ),
-                  ),
-                  const SizedBox(height: 25),
-                  SearchWidget(),
-                  categoryHeader(
-                    title: "trending now ",
-                    isIcon: true,
-                    isSeeAll: true,
-                  ),
-                  // the horizontal list view of recipes
-                  state is RecipesLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : SizedBox(
-                        height: MediaQuery.sizeOf(context).height * 0.305,
-                        child: BlocBuilder<RecipesCubit, RecipesState>(
-                          builder: (context, state) {
-                            return ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: 5,
-                              itemBuilder: (context, index) {
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 17),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      GestureDetector(
-                                        onTap:
-                                            () => context.push(
-                                              "/recipeInfo",
-                                              // pass the recipe model to the next screen using extra
-                                              extra:
-                                                  BlocProvider.of<RecipesCubit>(
-                                                    context,
-                                                  ).allRecipes[index],
-                                            ),
-                                        child: Container(
-                                          width:
-                                              MediaQuery.sizeOf(context).width *
-                                              .7,
-                                          height:
-                                              MediaQuery.sizeOf(
-                                                context,
-                                              ).height *
-                                              .26,
-                                          decoration: BoxDecoration(
-                                            borderRadius: BorderRadius.circular(
-                                              10,
-                                            ),
-                                            image: DecorationImage(
-                                              image: NetworkImage(
+            child:
+                state is RecipesLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : state is RecipesFauiler
+                    ? Center(
+                      child: Text(
+                        state.errorMessage,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontVariations: [FontVariation('wght', 700)],
+                        ),
+                      ),
+                    )
+                    : SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            "Find best recipes\nfor cooking",
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontVariations: [FontVariation('wght', 700)],
+                            ),
+                          ),
+                          const SizedBox(height: 25),
+                          SearchWidget(),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Text(
+                              "recipe of the day".capitalizeFirstLetter(),
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontVariations: [FontVariation('wght', 700)],
+                              ),
+                            ),
+                          ),
+                          state is RecipesLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : SizedBox(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.305,
+                                child: BlocBuilder<RecipesCubit, RecipesState>(
+                                  builder: (context, state) {
+                                    return GestureDetector(
+                                      onTap:
+                                          () => context.push(
+                                            "/recipeInfo",
+                                            // pass the recipe model to the next screen using extra
+                                            extra:
                                                 BlocProvider.of<RecipesCubit>(
                                                   context,
-                                                ).allRecipes[index].imageUrl,
-                                              ),
-                                              fit: BoxFit.cover,
-                                            ),
-                                            color: mainColor,
+                                                ).randomRecipe,
                                           ),
+                                      child: Stack(
+                                        children: [
+                                          Container(
+                                            height:
+                                                MediaQuery.sizeOf(
+                                                  context,
+                                                ).height *
+                                                0.305,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              image: DecorationImage(
+                                                image: NetworkImage(
+                                                  BlocProvider.of<RecipesCubit>(
+                                                    context,
+                                                  ).randomRecipe.imageUrl,
+                                                ),
+                                                fit: BoxFit.cover,
+                                              ),
+                                            ),
+                                          ),
+                                          Positioned(
+                                            top:
+                                                MediaQuery.sizeOf(
+                                                  context,
+                                                ).height *
+                                                0.305 *
+                                                .6,
+                                            bottom: 0,
+                                            left: 0,
+                                            right: 0,
+                                            child: Container(
+                                              color: mainColor.withAlpha(160),
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      vertical: 5,
+                                                      horizontal: 10,
+                                                    ),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceAround,
+                                                  children: [
+                                                    Text(
+                                                      BlocProvider.of<
+                                                            RecipesCubit
+                                                          >(context)
+                                                          .randomRecipe
+                                                          .title
+                                                          .capitalizeByWord(),
+
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 19,
+                                                        fontVariations: [
+                                                          FontVariation(
+                                                            'wght',
+                                                            700,
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    Row(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment.end,
+                                                      children: [
+                                                        Icon(
+                                                          Icons.timer,
+                                                          color: Colors.white,
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 10,
+                                                        ),
+                                                        Text(
+                                                          "${BlocProvider.of<RecipesCubit>(context).randomRecipe.readyInMinutes} Min",
+                                                          style: TextStyle(
+                                                            color: Colors.white,
+                                                            fontSize: 17,
+                                                            fontVariations: [
+                                                              FontVariation(
+                                                                'wght',
+                                                                600,
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Row(
+                              children: [
+                                Row(
+                                  children: [
+                                    Text(
+                                      "recipes".capitalizeFirstLetter(),
+                                      style: TextStyle(
+                                        fontSize: 25,
+                                        fontVariations: [
+                                          FontVariation('wght', 700),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const Spacer(),
+                                GestureDetector(
+                                  onTap: () => context.push("/allRecipes"),
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        "See all ",
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontVariations: [
+                                            FontVariation('wght', 600),
+                                          ],
+                                          color: mainColor,
                                         ),
                                       ),
-                                      SizedBox(
-                                        width:
-                                            MediaQuery.sizeOf(context).width *
-                                            .5,
-                                        child: Text(
-                                          BlocProvider.of<RecipesCubit>(context)
-                                              .allRecipes[index]
-                                              .title
-                                              .capitalizeByWord(),
-                                          style: TextStyle(
-                                            fontSize: 19,
-                                            fontVariations: [
-                                              FontVariation('wght', 600),
-                                            ],
-                                          ),
-                                          softWrap: true,
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
+                                      Icon(
+                                        Icons.arrow_forward_rounded,
+                                        color: mainColor,
                                       ),
                                     ],
                                   ),
-                                );
-                              },
-                            );
-                          },
-                        ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          // the horizontal list view of recipes
+                          state is RecipesLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : SizedBox(
+                                height:
+                                    MediaQuery.sizeOf(context).height * 0.305,
+                                child: BlocBuilder<RecipesCubit, RecipesState>(
+                                  builder: (context, state) {
+                                    return ListView.builder(
+                                      scrollDirection: Axis.horizontal,
+                                      itemCount: 5,
+                                      itemBuilder: (context, index) {
+                                        return Padding(
+                                          padding: const EdgeInsets.only(
+                                            right: 17,
+                                          ),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              GestureDetector(
+                                                onTap:
+                                                    () => context.push(
+                                                      "/recipeInfo",
+                                                      // pass the recipe model to the next screen using extra
+                                                      extra:
+                                                          BlocProvider.of<
+                                                            RecipesCubit
+                                                          >(
+                                                            context,
+                                                          ).allRecipes[index],
+                                                    ),
+                                                child: Container(
+                                                  width:
+                                                      MediaQuery.sizeOf(
+                                                        context,
+                                                      ).width *
+                                                      .7,
+                                                  height:
+                                                      MediaQuery.sizeOf(
+                                                        context,
+                                                      ).height *
+                                                      .26,
+                                                  decoration: BoxDecoration(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          10,
+                                                        ),
+                                                    image: DecorationImage(
+                                                      image: NetworkImage(
+                                                        BlocProvider.of<
+                                                              RecipesCubit
+                                                            >(context)
+                                                            .allRecipes[index]
+                                                            .imageUrl,
+                                                      ),
+                                                      fit: BoxFit.cover,
+                                                    ),
+                                                    color: mainColor,
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width:
+                                                    MediaQuery.sizeOf(
+                                                      context,
+                                                    ).width *
+                                                    .5,
+                                                child: Text(
+                                                  BlocProvider.of<RecipesCubit>(
+                                                        context,
+                                                      ).allRecipes[index].title
+                                                      .capitalizeByWord(),
+                                                  style: TextStyle(
+                                                    fontSize: 19,
+                                                    fontVariations: [
+                                                      FontVariation(
+                                                        'wght',
+                                                        600,
+                                                      ),
+                                                    ],
+                                                  ),
+                                                  softWrap: true,
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                  maxLines: 1,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                              ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 20),
+                            child: Text(
+                              "categories".capitalizeFirstLetter(),
+                              style: TextStyle(
+                                fontSize: 25,
+                                fontVariations: [FontVariation('wght', 700)],
+                              ),
+                            ),
+                          ),
+
+                          // the horizontal list view of categories
+                          state is RecipesLoading
+                              ? const Center(child: CircularProgressIndicator())
+                              : const Categories(),
+                          SizedBox(height: 20),
+
+                          // the  list view of recipes
+                          // RecipeAvatar(),
+                        ],
                       ),
-
-                  categoryHeader(title: "popular category"),
-
-                  // the horizontal list view of categories
-                  state is RecipesLoading
-                      ? const Center(child: CircularProgressIndicator())
-                      : const Categories(),
-                  SizedBox(height: 20),
-
-                  // the  list view of recipes
-                  // RecipeAvatar(),
-                  categoryHeader(title: "recent recipe", isSeeAll: true),
-                ],
-              ),
-            ),
+                    ),
           ),
         );
       },
@@ -326,34 +525,126 @@ class Categories extends StatelessWidget {
   }
 }
 
-class SearchWidget extends StatelessWidget {
+class SearchWidget extends StatefulWidget {
   const SearchWidget({super.key});
 
   @override
+  State<SearchWidget> createState() => _SearchWidgetState();
+}
+
+class _SearchWidgetState extends State<SearchWidget> {
+  final FocusNode _focusNode = FocusNode();
+  final TextEditingController _controller = TextEditingController();
+  bool _showSuggestions = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    setState(() {
+      _showSuggestions = _focusNode.hasFocus || _controller.text.isNotEmpty;
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
+    _focusNode.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return TextFormField(
-      decoration: InputDecoration(
-        prefixIcon: Icon(Icons.search, color: greyColor),
-        hintText: "Search recipes",
-        hintStyle: TextStyle(
-          fontSize: 16,
-          fontVariations: [FontVariation('wght', 400)],
-          color: Colors.grey,
+    return Column(
+      children: [
+        BlocBuilder<SearchCubit, SearchState>(
+          builder: (context, state) {
+            return TextFormField(
+              controller: _controller,
+              focusNode: _focusNode,
+              autofocus: true,
+              onChanged: (value) {
+                BlocProvider.of<SearchCubit>(
+                  context,
+                ).searchRecipes(search: value);
+                setState(() {
+                  _showSuggestions = value.isNotEmpty;
+                });
+              },
+              decoration: InputDecoration(
+                // Your existing decoration properties
+              ),
+            );
+          },
         ),
-        // filled: true,
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(),
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: greyColor, width: 2),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(10),
-          borderSide: BorderSide(color: darkmainColor, width: 2),
-        ),
-      ),
+        if (_showSuggestions)
+          Container(
+            height: 200, // Adjust height as needed
+            margin: const EdgeInsets.only(top: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(10),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black12,
+                  blurRadius: 6,
+                  offset: Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListView(
+              children: [
+                // Add your search suggestions here
+                // Example:
+                // ...state.suggestions.map((suggestion) => ListTile(...)),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }
+// class SearchWidget extends StatelessWidget {
+//   const SearchWidget({super.key});
+
+//   @override
+//   Widget build(BuildContext context) {
+//     return BlocBuilder<SearchCubit, SearchState>(
+//       builder: (context, state) {
+//         return TextFormField(
+//           autofocus: true,
+//           focusNode: FocusNode(),
+//           onChanged: (value) {
+//             BlocProvider.of<SearchCubit>(context).searchRecipes(search: value);
+//           },
+//           keyboardType: TextInputType.text,
+//           decoration: InputDecoration(
+//             prefixIcon: Icon(Icons.search, color: greyColor),
+//             hintText: "Search recipes",
+//             hintStyle: TextStyle(
+//               fontSize: 16,
+//               fontVariations: [FontVariation('wght', 400)],
+//               color: Colors.grey,
+//             ),
+//             border: OutlineInputBorder(
+//               borderRadius: BorderRadius.circular(10),
+//               borderSide: BorderSide(),
+//             ),
+//             enabledBorder: OutlineInputBorder(
+//               borderRadius: BorderRadius.circular(10),
+//               borderSide: BorderSide(color: greyColor, width: 2),
+//             ),
+//             focusedBorder: OutlineInputBorder(
+//               borderRadius: BorderRadius.circular(10),
+//               borderSide: BorderSide(color: darkmainColor, width: 2),
+//             ),
+//           ),
+//         );
+//       },
+//     );
+//   }
+// }
