@@ -3,6 +3,7 @@ import 'package:html/parser.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/extention/extentions.dart';
 import 'package:meals_recipes/services/models/recipes_model.dart';
+import 'package:meals_recipes/widgets/bookmark_button.dart';
 import 'package:meals_recipes/widgets/expandable_text.dart';
 
 class RecipeInformation extends StatefulWidget {
@@ -24,6 +25,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
 
   @override
   Widget build(BuildContext context) {
+    final uniqueEquipment = widget.recipesModel.equipment.toSet().toList();
     return Scaffold(
       body: Stack(
         children: [
@@ -56,18 +58,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
                     },
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(50),
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.bookmark_add_outlined, size: 28),
-                    onPressed: () {
-                      // Add your bookmark functionality here
-                    },
-                  ),
-                ),
+                BookmarkButton(dataModel: widget.recipesModel),
               ],
             ),
           ),
@@ -218,29 +209,36 @@ class _RecipeInformationState extends State<RecipeInformation> {
                               ],
                             ),
                             const SizedBox(height: 15),
-                            Text(
-                              "diets".capitalizeFirstLetter(),
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
+                            widget.recipesModel.diets.isNotEmpty
+                                ? Text(
+                                  "diets".capitalizeFirstLetter(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
+                                )
+                                : SizedBox(),
+                            SizedBox(
+                              height:
+                                  widget.recipesModel.diets.isNotEmpty ? 10 : 0,
                             ),
-                            const SizedBox(height: 10),
-                            Container(
-                              padding: const EdgeInsets.all(5),
-                              decoration: BoxDecoration(
-                                color: Colors.green,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                widget.recipesModel.diets.join(', '),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
+                            widget.recipesModel.diets.isNotEmpty
+                                ? Container(
+                                  padding: const EdgeInsets.all(5),
+                                  decoration: BoxDecoration(
+                                    color: Colors.green,
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                  child: Text(
+                                    widget.recipesModel.diets.join(', '),
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                )
+                                : SizedBox(),
                             const SizedBox(height: 20),
 
                             Text(
@@ -345,7 +343,6 @@ class _RecipeInformationState extends State<RecipeInformation> {
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
                               itemCount: widget.recipesModel.ingredients.length,
-
                               itemBuilder: (context, index) {
                                 return Padding(
                                   padding: const EdgeInsets.only(bottom: 5),
@@ -353,33 +350,42 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                     mainAxisAlignment:
                                         MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Row(
-                                        children: [
-                                          Container(
-                                            width: 80,
-                                            height: 80,
-                                            decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                image: NetworkImage(
-                                                  'https://spoonacular.com/cdn/ingredients_100x100/${widget.recipesModel.ingredients[index].image}',
+                                      // Left side: Image and Ingredient Name
+                                      Flexible(
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 80,
+                                              height: 80,
+                                              decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                                  image: NetworkImage(
+                                                    'https://spoonacular.com/cdn/ingredients_100x100/${widget.recipesModel.ingredients[index].image}',
+                                                  ),
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 15),
-                                          Text(
-                                            widget
-                                                .recipesModel
-                                                .ingredients[index]
-                                                .originalName
-                                                .capitalizeByWord(),
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              color: Colors.black,
+                                            const SizedBox(width: 15),
+                                            Flexible(
+                                              child: Text(
+                                                widget
+                                                    .recipesModel
+                                                    .ingredients[index]
+                                                    .originalName
+                                                    .capitalizeByWord(),
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                                maxLines: 2,
+                                                softWrap: true,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
+                                      // Right side: Amount and Unit
                                       Row(
                                         children: [
                                           Text(
@@ -419,7 +425,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
                             ListView.builder(
                               physics: const NeverScrollableScrollPhysics(),
                               shrinkWrap: true,
-                              itemCount: widget.recipesModel.equipment.length,
+                              itemCount: uniqueEquipment.length,
                               itemBuilder: (context, index) {
                                 return Row(
                                   children: [
@@ -429,14 +435,14 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                       decoration: BoxDecoration(
                                         image: DecorationImage(
                                           image: NetworkImage(
-                                            '${widget.recipesModel.equipment[index].image}',
+                                            '${uniqueEquipment[index].image}',
                                           ),
                                         ),
                                       ),
                                     ),
                                     const SizedBox(width: 15),
                                     Text(
-                                      widget.recipesModel.equipment[index].name
+                                      uniqueEquipment[index].name
                                           .capitalizeByWord(),
                                       style: const TextStyle(
                                         fontSize: 16,

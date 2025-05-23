@@ -314,28 +314,36 @@ class HomePage extends StatelessWidget {
                                   },
                                 ),
                               ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 20),
-                            child: Text(
-                              "categories".capitalizeFirstLetter(),
-                              style: TextStyle(
-                                fontSize: 25,
-                                fontVariations: [FontVariation('wght', 700)],
-                              ),
-                            ),
-                          ),
+                          SizedBox(height: 40),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(vertical: 20),
+                          //   child: Text(
+                          //     "categories".capitalizeFirstLetter(),
+                          //     style: TextStyle(
+                          //       fontSize: 25,
+                          //       fontVariations: [FontVariation('wght', 700)],
+                          //     ),
+                          //   ),
+                          // ),
 
-                          // the horizontal list view of categories
-                          state is RecipesLoading
-                              ? const Center(child: CircularProgressIndicator())
-                              : const Categories(),
-                          SizedBox(height: 20),
+                          // // the horizontal list view of categories
+                          // state is RecipesLoading
+                          //     ? const Center(child: CircularProgressIndicator())
+                          //     : const Categories(),
+                          // SizedBox(height: 20),
 
-                          // the  list view of recipes
-                          // RecipeAvatar(),
+                          // // the  list view of recipes
+                          // // RecipeAvatar(),
                         ],
                       ),
                     ),
+          ),
+          floatingActionButton: FloatingActionButton(
+            // backgroundColor: mainColor,
+            onPressed: () {
+              context.push("/bookmark");
+            },
+            child: const Icon(Icons.bookmark, size: 30),
           ),
         );
       },

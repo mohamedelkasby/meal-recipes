@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/routes.dart';
+import 'package:meals_recipes/services/cubit/bookmark_cubit/bookmark_cubit.dart';
 import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
 import 'package:meals_recipes/services/cubit/search_cubit/search_cubit.dart';
 
@@ -17,8 +18,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => RecipesCubit()),
+        BlocProvider(create: (context) => RecipesCubit(), lazy: false),
         BlocProvider(create: (context) => SearchCubit()),
+        BlocProvider(create: (context) => BookmarkCubit(), lazy: false),
       ],
       // create: (context) => RecipesCubit(),
       child: MaterialApp.router(
