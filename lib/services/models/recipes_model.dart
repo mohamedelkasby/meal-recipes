@@ -92,6 +92,7 @@ class RecipesModel {
   // Factory constructor for saved data (from SharedPreferences)
   factory RecipesModel.fromJsonString(String jsonString) {
     final Map<String, dynamic> json = jsonDecode(jsonString);
+
     return RecipesModel.fromSavedJson(json);
   }
 

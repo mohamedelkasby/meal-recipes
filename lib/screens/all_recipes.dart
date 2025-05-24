@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
+import 'package:meals_recipes/widgets/bookmark_button.dart';
 
 class AllRecipes extends StatelessWidget {
   const AllRecipes({super.key});
@@ -41,16 +42,31 @@ class AllRecipes extends StatelessWidget {
                   margin: EdgeInsets.all(5),
                   child: ListBody(
                     children: [
-                      ListTile(
-                        title: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: Image.network(
-                            BlocProvider.of<RecipesCubit>(
-                              context,
-                            ).allRecipes[index].imageUrl,
-                            fit: BoxFit.cover,
+                      Stack(
+                        children: [
+                          ListTile(
+                            title: ClipRRect(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Image.network(
+                                height: 170,
+                                BlocProvider.of<RecipesCubit>(
+                                  context,
+                                ).allRecipes[index].imageUrl,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
                           ),
-                        ),
+                          Positioned(
+                            top: 20,
+                            right: 35,
+                            child: BookmarkButton(
+                              dataModel:
+                                  BlocProvider.of<RecipesCubit>(
+                                    context,
+                                  ).allRecipes[index],
+                            ),
+                          ),
+                        ],
                       ),
                       ListTile(
                         title: Text(
@@ -58,7 +74,7 @@ class AllRecipes extends StatelessWidget {
                             context,
                           ).allRecipes[index].title,
                           style: const TextStyle(
-                            fontSize: 20,
+                            fontSize: 19,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

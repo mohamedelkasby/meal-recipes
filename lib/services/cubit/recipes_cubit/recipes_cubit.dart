@@ -14,22 +14,24 @@ class RecipesCubit extends Cubit<RecipesState> {
   List<String> categories = [];
   List<Map<String, dynamic>> searchResults = [];
 
-  RecipesModel randomRecipe = RecipesModel(
-    id: 0,
-    title: '',
-    imageUrl: '',
-    description: '',
-    cookingTime: "0",
-    readyInMinutes: "0",
-    ingredients: [],
-    steps: [],
-    servings: 0,
-    diets: [],
-    dishType: [],
-    equipment: [],
-    favorite: false,
-    healthy: false,
-  );
+  List<RecipesModel> randomRecipes = [
+    RecipesModel(
+      id: 0,
+      title: '',
+      imageUrl: '',
+      description: '',
+      cookingTime: "0",
+      readyInMinutes: "0",
+      ingredients: [],
+      steps: [],
+      servings: 0,
+      diets: [],
+      dishType: [],
+      equipment: [],
+      favorite: false,
+      healthy: false,
+    ),
+  ];
 
   Future<void> getAllRecipes() async {
     emit(RecipesLoading());
@@ -53,9 +55,9 @@ class RecipesCubit extends Cubit<RecipesState> {
   Future<void> getRandomRecipes() async {
     emit(RecipesLoading());
     try {
-      randomRecipe = await RecipesServices().fetchRandomRecipe();
+      randomRecipes = await RecipesServices().fetchRandomRecipes();
       // emit(RecipesSuccess());
-      print(randomRecipe);
+      // print(randomRecipe);
     } on Exception catch (e) {
       emit(RecipesFauiler(errorMessage: e.toString()));
     }

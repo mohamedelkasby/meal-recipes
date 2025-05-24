@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/services/cubit/bookmark_cubit/bookmark_cubit.dart';
+import 'package:meals_recipes/widgets/bookmark_button.dart';
 
 class BookmarkPage extends StatelessWidget {
   const BookmarkPage({super.key});
@@ -49,16 +50,30 @@ class BookmarkPage extends StatelessWidget {
                       margin: EdgeInsets.all(5),
                       child: ListBody(
                         children: [
-                          ListTile(
-                            title: ClipRRect(
-                              borderRadius: BorderRadius.circular(20),
-                              child: Image.network(
-                                BlocProvider.of<BookmarkCubit>(
-                                  context,
-                                ).savedRecipes[index].imageUrl,
-                                fit: BoxFit.cover,
+                          Stack(
+                            children: [
+                              ListTile(
+                                title: ClipRRect(
+                                  borderRadius: BorderRadius.circular(20),
+                                  child: Image.network(
+                                    BlocProvider.of<BookmarkCubit>(
+                                      context,
+                                    ).savedRecipes[index].imageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                ),
                               ),
-                            ),
+                              Positioned(
+                                top: 20,
+                                right: 35,
+                                child: BookmarkButton(
+                                  dataModel:
+                                      BlocProvider.of<BookmarkCubit>(
+                                        context,
+                                      ).savedRecipes[index],
+                                ),
+                              ),
+                            ],
                           ),
                           ListTile(
                             title: Text(

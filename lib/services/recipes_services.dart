@@ -32,18 +32,10 @@ class RecipesServices {
     }
   }
 
-  Future<RecipesModel> fetchRandomRecipe() async {
-    try {
-      http.Response response = await http.get(Uri.parse(randomRecipesUrl));
-      if (response.statusCode == 200) {
-        var jsonData = jsonDecode(response.body);
-        RecipesModel recipesModel = RecipesModel.fromJson(
-          jsonData['recipes'][0],
-        );
-        return recipesModel;
-      } else {
-        print('Failed to load random recipe${response.statusCode}');
-        return RecipesModel(
+  Future<List<RecipesModel>> fetchRandomRecipes() async {
+    emptyrecipesList() {
+      return [
+        RecipesModel(
           id: 0,
           title: '',
           imageUrl: '',
@@ -58,26 +50,30 @@ class RecipesServices {
           equipment: [],
           favorite: false,
           healthy: false,
-        );
+        ),
+      ];
+    }
+
+    try {
+      http.Response response = await http.get(Uri.parse(randomRecipesUrl));
+      if (response.statusCode == 200) {
+        var jsonData = jsonDecode(response.body);
+        List<RecipesModel> recipes = [];
+        for (var recipe in jsonData['recipes']) {
+          recipes.add(RecipesModel.fromJson(recipe));
+        }
+
+        // RecipesModel recipesModel = RecipesModel.fromJson(
+        //   jsonData['recipes'][0],
+        // );
+        return recipes;
+      } else {
+        print('Failed to load random recipe${response.statusCode}');
+        return emptyrecipesList();
       }
     } on Exception catch (e) {
       print('Error: $e');
-      return RecipesModel(
-        id: 0,
-        title: '',
-        imageUrl: '',
-        description: '',
-        cookingTime: "0",
-        readyInMinutes: "0",
-        ingredients: [],
-        steps: [],
-        servings: 0,
-        diets: [],
-        dishType: [],
-        equipment: [],
-        favorite: false,
-        healthy: false,
-      );
+      return emptyrecipesList();
     }
   }
 

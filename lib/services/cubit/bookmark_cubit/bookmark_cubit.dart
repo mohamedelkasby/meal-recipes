@@ -6,11 +6,11 @@ part 'bookmark_state.dart';
 
 class BookmarkCubit extends Cubit<BookmarkState> {
   BookmarkCubit() : super(BookmarkInitial()) {
-    _initializeSavedRecipes();
+    initializeSavedRecipes();
   }
 
   List<RecipesModel> _savedRecipes = [];
-  bool _isInitialized = false;
+  bool isInitialized = false;
 
   List<RecipesModel> get savedRecipes => List.unmodifiable(_savedRecipes);
 
@@ -19,10 +19,10 @@ class BookmarkCubit extends Cubit<BookmarkState> {
   }
 
   // Initialize saved recipes when cubit is created
-  Future<void> _initializeSavedRecipes() async {
-    if (!_isInitialized) {
+  Future<void> initializeSavedRecipes() async {
+    if (!isInitialized) {
       await loadSavedState();
-      _isInitialized = true;
+      isInitialized = true;
     }
   }
 
@@ -35,15 +35,11 @@ class BookmarkCubit extends Cubit<BookmarkState> {
 
       final prefs = await SharedPreferences.getInstance();
 
-      // Debug: Print what's actually stored
-      print('Loading saved recipes from SharedPreferences...');
       List<String> savedModelsList = prefs.getStringList("saved_model") ?? [];
-      print('Found ${savedModelsList.length} saved recipes');
 
       if (savedModelsList.isEmpty) {
         _savedRecipes = [];
         emit(BookmarkEmpty(isEmpty: true));
-        print('No saved recipes found');
       } else {
         // Parse each saved recipe with error handling
         List<RecipesModel> loadedRecipes = [];
@@ -51,18 +47,14 @@ class BookmarkCubit extends Cubit<BookmarkState> {
           try {
             RecipesModel recipe = RecipesModel.fromJsonString(jsonString);
             loadedRecipes.add(recipe);
-            print('Successfully loaded recipe: ${recipe.title}');
           } catch (e) {
             print('Error parsing recipe JSON: $e');
-            print('Problematic JSON: $jsonString');
-            // Continue with other recipes even if one fails
           }
         }
 
         _savedRecipes = loadedRecipes;
         if (_savedRecipes.isNotEmpty) {
           emit(BookmarkLoaded(recipes: _savedRecipes));
-          print('Loaded ${_savedRecipes.length} recipes successfully');
         } else {
           emit(BookmarkEmpty(isEmpty: true));
         }
@@ -82,13 +74,11 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       if (wasAlreadySaved) {
         // Remove the recipe
         _savedRecipes.removeWhere((recipe) => recipe.id == dataModel.id);
-        print('Removed recipe: ${dataModel.title}');
         emit(BookmarkDeleted(isDeleted: true));
       } else {
         // Add the recipe with isSaved = true
         RecipesModel recipeToSave = dataModel.copyWith(isSaved: true);
         _savedRecipes.add(recipeToSave);
-        print('Added recipe: ${dataModel.title}');
         emit(BookmarkSaved(isSaved: true));
       }
 
@@ -97,15 +87,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
         List<String> jsonStringList =
             _savedRecipes.map((recipe) => recipe.toJsonString()).toList();
 
-        bool success = await prefs.setStringList("saved_model", jsonStringList);
-        print('Saved to SharedPreferences: $success');
-        print('Total saved recipes: ${_savedRecipes.length}');
-
-        // Verify the save by reading it back
-        List<String>? verification = prefs.getStringList("saved_model");
-        print(
-          'Verification - recipes in storage: ${verification?.length ?? 0}',
-        );
+        await prefs.setStringList("saved_model", jsonStringList);
       } catch (saveError) {
         print('Error saving to SharedPreferences: $saveError');
         // Revert the in-memory change if save failed
@@ -139,7 +121,6 @@ class BookmarkCubit extends Cubit<BookmarkState> {
           _savedRecipes.map((recipe) => recipe.toJsonString()).toList();
 
       await prefs.setStringList("saved_model", jsonStringList);
-      print('Removed recipe: ${recipe.title}');
 
       if (_savedRecipes.isEmpty) {
         emit(BookmarkEmpty(isEmpty: true));
@@ -164,7 +145,6 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       await prefs.remove("saved_model");
       _savedRecipes.clear();
       emit(BookmarkEmpty(isEmpty: true));
-      print('Cleared all saved recipes');
     } catch (e) {
       print('Error clearing saved recipes: $e');
     }

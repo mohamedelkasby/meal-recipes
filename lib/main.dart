@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/routes.dart';
@@ -7,6 +8,15 @@ import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
 import 'package:meals_recipes/services/cubit/search_cubit/search_cubit.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: Brightness.dark,
+      systemNavigationBarColor: Colors.white,
+      systemNavigationBarIconBrightness: Brightness.dark,
+    ),
+  );
   runApp(const MyApp());
 }
 
@@ -22,7 +32,7 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (context) => SearchCubit()),
         BlocProvider(create: (context) => BookmarkCubit(), lazy: false),
       ],
-      // create: (context) => RecipesCubit(),
+
       child: MaterialApp.router(
         title: 'Flutter Demo',
         debugShowCheckedModeBanner: false,
@@ -31,14 +41,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           fontFamily: "Inter",
           // useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: mainColor,
-            // surface: const Color(0xffE23E3E),
-            // onSurface: const Color(0xffE23E3E),
-          ),
+          colorScheme: ColorScheme.fromSeed(seedColor: mainColor),
         ),
 
-        // home: const WelcomePage(),
         routerConfig: routes,
       ),
     );
