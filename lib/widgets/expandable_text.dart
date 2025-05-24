@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meals_recipes/models/translatable_text.dart';
 
 class ExpandableText extends StatefulWidget {
   final String text;
@@ -29,7 +30,7 @@ class _ExpandableTextState extends State<ExpandableText> {
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            TranslatableText(
               widget.text,
               style: widget.style,
               maxLines: _isExpanded ? null : 5,
@@ -38,7 +39,7 @@ class _ExpandableTextState extends State<ExpandableText> {
             if (needsReadMore)
               GestureDetector(
                 onTap: () => setState(() => _isExpanded = !_isExpanded),
-                child: Text(
+                child: TranslatableText(
                   _isExpanded ? 'Read Less' : 'Read More',
                   style: const TextStyle(
                     color: Colors.blue,
