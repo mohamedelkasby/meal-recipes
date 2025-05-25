@@ -56,7 +56,7 @@ class RecipesCubit extends Cubit<RecipesState> {
     emit(RecipesLoading());
     try {
       randomRecipes = await RecipesServices().fetchRandomRecipes();
-      // emit(RecipesSuccess());
+      emit(RecipesSuccess());
       // print(randomRecipe);
     } on Exception catch (e) {
       emit(RecipesFauiler(errorMessage: e.toString()));

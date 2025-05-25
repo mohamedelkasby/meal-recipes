@@ -6,7 +6,7 @@ class IngredientModel {
   final String unit;
   final String originalName;
   final String aisle;
-  final String? image;
+  final String image;
 
   IngredientModel({
     required this.name,
@@ -14,7 +14,7 @@ class IngredientModel {
     required this.unit,
     required this.originalName,
     required this.aisle,
-    this.image,
+    required this.image,
   });
 
   factory IngredientModel.fromJson(Map<String, dynamic> json) {
@@ -52,7 +52,7 @@ class IngredientModel {
       originalName:
           json['nameClean']?.toString() ?? json['original']?.toString() ?? '',
       aisle: json['aisle']?.toString() ?? '',
-      image: json['image']?.toString(),
+      image: json['image']?.toString() ?? '',
     );
   }
 

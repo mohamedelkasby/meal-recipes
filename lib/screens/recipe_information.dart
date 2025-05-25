@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/extention/extentions.dart';
@@ -10,6 +11,7 @@ import 'package:meals_recipes/services/cubit/language/language_cubit.dart';
 import 'package:meals_recipes/services/models/recipes_model.dart';
 import 'package:meals_recipes/widgets/bookmark_button.dart';
 import 'package:meals_recipes/widgets/expandable_text.dart';
+import 'package:meals_recipes/widgets/handle_image_error.dart';
 
 class RecipeInformation extends StatefulWidget {
   const RecipeInformation({super.key, required this.recipesModel});
@@ -53,10 +55,10 @@ class _RecipeInformationState extends State<RecipeInformation> {
                     Container(
                       height: MediaQuery.sizeOf(context).height * 0.4,
                       width: double.infinity,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: NetworkImage(widget.recipesModel.imageUrl),
-                          fit: BoxFit.cover,
+                      child: handleImageError(
+                        urlImage: widget.recipesModel.imageUrl,
+                        errorImage: Image.asset(
+                          "assets/images/no_Internet.jpeg",
                         ),
                       ),
                     ),
@@ -397,15 +399,16 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                                 Flexible(
                                                   child: Row(
                                                     children: [
-                                                      Container(
+                                                      SizedBox(
                                                         width: 80,
                                                         height: 80,
-                                                        decoration: BoxDecoration(
-                                                          image: DecorationImage(
-                                                            image: NetworkImage(
-                                                              'https://spoonacular.com/cdn/ingredients_100x100/${widget.recipesModel.ingredients[index].image}',
-                                                            ),
-                                                          ),
+                                                        child: handleImageError(
+                                                          urlImage:
+                                                              "https://spoonacular.com/cdn/ingredients_100x100/${widget.recipesModel.ingredients[index].image}",
+                                                          errorImage:
+                                                              SvgPicture.asset(
+                                                                "assets/images/no_image.svg",
+                                                              ),
                                                         ),
                                                       ),
                                                       const SizedBox(width: 15),
@@ -478,14 +481,14 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                         itemBuilder: (context, index) {
                                           return Row(
                                             children: [
-                                              Container(
-                                                width: 90,
-                                                height: 90,
-                                                decoration: BoxDecoration(
-                                                  image: DecorationImage(
-                                                    image: NetworkImage(
+                                              SizedBox(
+                                                width: 80,
+                                                height: 80,
+                                                child: handleImageError(
+                                                  urlImage:
                                                       '${uniqueEquipment[index].image}',
-                                                    ),
+                                                  errorImage: SvgPicture.asset(
+                                                    "assets/images/no_image.svg",
                                                   ),
                                                 ),
                                               ),
