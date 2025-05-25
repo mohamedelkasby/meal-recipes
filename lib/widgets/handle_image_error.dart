@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 Widget handleImageError({
   required String urlImage,
   required Widget errorImage,
+  BoxFit fit = BoxFit.cover,
 }) {
   return Image.network(
     urlImage,
-    fit: BoxFit.cover,
+    fit: fit,
     errorBuilder: (context, error, stackTrace) {
       return Container(
         decoration: BoxDecoration(

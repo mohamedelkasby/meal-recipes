@@ -52,7 +52,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
               child: Scaffold(
                 body: Stack(
                   children: [
-                    Container(
+                    SizedBox(
                       height: MediaQuery.sizeOf(context).height * 0.4,
                       width: double.infinity,
                       child: handleImageError(
@@ -409,6 +409,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                                               SvgPicture.asset(
                                                                 "assets/images/no_image.svg",
                                                               ),
+                                                          fit: BoxFit.contain,
                                                         ),
                                                       ),
                                                       const SizedBox(width: 15),
@@ -490,6 +491,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                                   errorImage: SvgPicture.asset(
                                                     "assets/images/no_image.svg",
                                                   ),
+                                                  fit: BoxFit.contain,
                                                 ),
                                               ),
                                               const SizedBox(width: 15),

@@ -235,14 +235,22 @@ class HomePage extends StatelessWidget {
                                                         Positioned(
                                                           top: 10,
                                                           right: 10,
-                                                          child: BookmarkButton(
-                                                            dataModel:
-                                                                BlocProvider.of<
-                                                                      RecipesCubit
-                                                                    >(context)
-                                                                    .randomRecipes
-                                                                    .first,
-                                                          ),
+
+                                                          child:
+                                                              BlocProvider.of<
+                                                                            RecipesCubit
+                                                                          >(context)
+                                                                          .randomRecipes
+                                                                          .first
+                                                                          .title ==
+                                                                      ""
+                                                                  ? SizedBox()
+                                                                  : BookmarkButton(
+                                                                    dataModel:
+                                                                        BlocProvider.of<
+                                                                          RecipesCubit
+                                                                        >(context).randomRecipes.first,
+                                                                  ),
                                                         ),
                                                       ],
                                                     ),

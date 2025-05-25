@@ -47,11 +47,49 @@ class AllRecipes extends StatelessWidget {
                           ListTile(
                             title: ClipRRect(
                               borderRadius: BorderRadius.circular(20),
-                              child: handelImageError(
-                                image:
-                                    BlocProvider.of<RecipesCubit>(
-                                      context,
-                                    ).allRecipes[index].imageUrl,
+                              child: Image.network(
+                                BlocProvider.of<RecipesCubit>(
+                                  context,
+                                ).allRecipes[index].imageUrl,
+                                height: 170,
+                                fit: BoxFit.cover,
+                                errorBuilder: (context, error, stackTrace) {
+                                  return Container(
+                                    height: 170,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(20),
+                                      color: Colors.grey[300],
+                                    ),
+                                    child: Image.asset(
+                                      'assets/images/no_Internet.jpeg', // Your local fallback image
+                                      height: 170,
+                                      fit: BoxFit.cover,
+                                    ),
+                                  );
+                                },
+                                loadingBuilder: (
+                                  context,
+                                  child,
+                                  loadingProgress,
+                                ) {
+                                  if (loadingProgress == null) return child;
+                                  return Container(
+                                    height: 170,
+                                    child: Center(
+                                      child: CircularProgressIndicator(
+                                        value:
+                                            loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                      ),
+                                    ),
+                                  );
+                                },
                               ),
                             ),
                           ),
@@ -86,43 +124,6 @@ class AllRecipes extends StatelessWidget {
           );
         },
       ),
-    );
-  }
-
-  Image handelImageError({required String image}) {
-    return Image.network(
-      image,
-      height: 170,
-      fit: BoxFit.cover,
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          height: 170,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(20),
-            color: Colors.grey[300],
-          ),
-          child: Image.asset(
-            'assets/images/no_Internet.jpeg', // Your local fallback image
-            height: 170,
-            fit: BoxFit.cover,
-          ),
-        );
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return Container(
-          height: 170,
-          child: Center(
-            child: CircularProgressIndicator(
-              value:
-                  loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                          loadingProgress.expectedTotalBytes!
-                      : null,
-            ),
-          ),
-        );
-      },
     );
   }
 }
