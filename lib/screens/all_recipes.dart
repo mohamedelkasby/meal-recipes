@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meals_recipes/models/translatable_text.dart';
 import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
 import 'package:meals_recipes/widgets/bookmark_button.dart';
 
@@ -11,7 +12,7 @@ class AllRecipes extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Recipes'),
+        title: const TranslatableText('All Recipes'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -106,7 +107,7 @@ class AllRecipes extends StatelessWidget {
                         ],
                       ),
                       ListTile(
-                        title: Text(
+                        title: TranslatableText(
                           BlocProvider.of<RecipesCubit>(
                             context,
                           ).allRecipes[index].title,

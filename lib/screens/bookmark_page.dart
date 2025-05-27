@@ -1,7 +1,7 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:meals_recipes/models/translatable_text.dart';
 import 'package:meals_recipes/services/cubit/bookmark_cubit/bookmark_cubit.dart';
 import 'package:meals_recipes/widgets/bookmark_button.dart';
 
@@ -12,7 +12,7 @@ class BookmarkPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('saved recipes'),
+        title: const TranslatableText('saved recipes'),
         centerTitle: true,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
@@ -25,7 +25,7 @@ class BookmarkPage extends StatelessWidget {
         builder: (context, state) {
           return BlocProvider.of<BookmarkCubit>(context).savedRecipes.isEmpty
               ? const Center(
-                child: Text(
+                child: TranslatableText(
                   'No saved recipes',
                   style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                 ),
@@ -76,7 +76,7 @@ class BookmarkPage extends StatelessWidget {
                             ],
                           ),
                           ListTile(
-                            title: Text(
+                            title: TranslatableText(
                               BlocProvider.of<BookmarkCubit>(
                                 context,
                               ).savedRecipes[index].title,

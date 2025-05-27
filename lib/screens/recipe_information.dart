@@ -81,7 +81,9 @@ class _RecipeInformationState extends State<RecipeInformation> {
                               },
                             ),
                           ),
-                          BookmarkButton(dataModel: widget.recipesModel),
+                          widget.recipesModel.title == ""
+                              ? SizedBox()
+                              : BookmarkButton(dataModel: widget.recipesModel),
                         ],
                       ),
                     ),

@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:meals_recipes/extention/colors.dart';
+import 'package:meals_recipes/models/translatable_text.dart';
+import 'package:meals_recipes/services/cubit/language/language_cubit.dart';
 import 'package:meals_recipes/services/cubit/search_cubit/search_cubit.dart';
 import 'package:meals_recipes/services/models/recipes_model.dart';
 import 'package:meals_recipes/services/recipes_services.dart';
@@ -16,6 +18,7 @@ class SearchBarWidget extends StatelessWidget {
         if (state is SearchSuccess) {}
       },
       builder: (context, state) {
+        final languageCubit = context.read<LanguageCubit>();
         return Column(
           children: [
             TextFormField(
@@ -25,7 +28,7 @@ class SearchBarWidget extends StatelessWidget {
               onTap: () {
                 BlocProvider.of<SearchCubit>(context).steadySearchResults();
               },
-              onChanged: (value) {
+              onChanged: (value) async {
                 BlocProvider.of<SearchCubit>(
                   context,
                 ).searchRecipes(search: value);
@@ -33,16 +36,25 @@ class SearchBarWidget extends StatelessWidget {
                   BlocProvider.of<SearchCubit>(context).clearSearchResults();
                   FocusManager.instance.primaryFocus?.unfocus();
                   textcontroller.clear();
+                  return;
                 }
-                print(" -------------$state -----------------");
-                print(
-                  " --------------${BlocProvider.of<SearchCubit>(context).searchResults} -----------------",
-                );
+
+                if (BlocProvider.of<LanguageCubit>(context).isArabic) {
+                  // Translate search text if in Arabic
+                  final searchTerm = await languageCubit.translateForSearch(
+                    value,
+                  );
+                  // Search with translated term
+                  BlocProvider.of<SearchCubit>(
+                    context,
+                  ).searchRecipes(search: searchTerm);
+                }
               },
               // design of the text field
               decoration: InputDecoration(
                 prefixIcon: Icon(Icons.search, color: greyColor),
-                hintText: "Search recipes",
+                hintText:
+                    languageCubit.isArabic ? "ابحث عن وصفات" : "Search recipes",
                 hintStyle: TextStyle(
                   fontSize: 16,
                   fontVariations: [FontVariation('wght', 400)],
@@ -133,7 +145,7 @@ class SearchBarWidget extends StatelessWidget {
                             width: 50,
                             height: 50,
                           ),
-                          title: Text(
+                          title: TranslatableText(
                             BlocProvider.of<SearchCubit>(
                               context,
                             ).searchResults[index]['title'],

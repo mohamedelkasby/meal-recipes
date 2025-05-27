@@ -141,4 +141,37 @@ class LanguageCubit extends Cubit<LanguageState> {
     'piece': 'قطعة',
     'pieces': 'قطع',
   };
+
+  Future<String> translateForSearch(String searchText) async {
+    try {
+      // If text is in Arabic, translate to English for search
+      if (isArabic) {
+        // Check cache first
+        String cacheKey = '${searchText}_ar_en';
+        if (translationCache.containsKey(cacheKey)) {
+          return translationCache[cacheKey]!;
+        }
+
+        // Translate to English
+        Translation translation = await _translator.translate(
+          searchText,
+          from: 'ar',
+          to: 'en',
+        );
+
+        String translatedText = translation.text.toLowerCase();
+
+        // Cache the translation
+        translationCache[cacheKey] = translatedText;
+
+        return translatedText;
+      }
+
+      // If text is in English, return as is
+      return searchText.toLowerCase();
+    } catch (e) {
+      print('Search translation error: $e');
+      return searchText; // Return original text if translation fails
+    }
+  }
 }
