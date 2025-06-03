@@ -18,55 +18,41 @@ class LanguageToggleButton extends StatelessWidget {
             color: mainColor.withAlpha(50),
             borderRadius: BorderRadius.circular(25),
             border: Border.all(color: mainColor.withAlpha(150)),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              _buildLanguageOption(
-                context,
-                'EN',
-                'en',
-                languageCubit.isEnglish,
-                languageCubit,
-              ),
-              _buildLanguageOption(
-                context,
-                'عربي',
-                'ar',
-                languageCubit.isArabic,
-                languageCubit,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.grey,
+                blurRadius: 10,
+                // blurStyle: BlurStyle.normal,
+                spreadRadius: -6,
+                offset: Offset(0, 4),
               ),
             ],
           ),
+
+          child: GestureDetector(
+            onTap: () {
+              languageCubit.isArabic
+                  ? languageCubit.setLanguage("en")
+                  : languageCubit.setLanguage("ar");
+            },
+            child: Container(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: mainColor,
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                languageCubit.currentLanguage == "en" ? "عربى" : "English",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ),
+          ),
         );
       },
-    );
-  }
-
-  Widget _buildLanguageOption(
-    BuildContext context,
-    String label,
-    String languageCode,
-    bool isSelected,
-    LanguageCubit cubit,
-  ) {
-    return GestureDetector(
-      onTap: () => cubit.setLanguage(languageCode),
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected ? mainColor : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected ? Colors.white : mainColor,
-            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-            fontSize: 14,
-          ),
-        ),
-      ),
     );
   }
 }

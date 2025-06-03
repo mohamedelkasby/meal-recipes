@@ -13,6 +13,20 @@ class RecipesCubit extends Cubit<RecipesState> {
   List<RecipesModel> allRecipes = [];
   List<String> categories = [];
   List<Map<String, dynamic>> searchResults = [];
+  String _unitType = "metric";
+  String get unitType => _unitType;
+  bool get ismetric => _unitType == 'metric';
+  bool get isUS => _unitType == 'us';
+
+  Future<void> unitToggleButton() async {
+    try {
+      _unitType = _unitType == 'metric' ? 'us' : 'metric';
+
+      emit(UnitTypeChanged(_unitType));
+    } catch (e) {
+      emit(RecipesFauiler(errorMessage: e.toString()));
+    }
+  }
 
   List<RecipesModel> randomRecipes = [
     RecipesModel(
@@ -36,7 +50,7 @@ class RecipesCubit extends Cubit<RecipesState> {
   Future<void> getAllRecipes() async {
     emit(RecipesLoading());
     try {
-      allRecipes = await RecipesServices().fetchAllRecipes();
+      allRecipes = await RecipesServices().fetchAllRecipes(type: _unitType);
       emit(RecipesSuccess());
     } on Exception catch (e) {
       emit(RecipesFauiler(errorMessage: e.toString()));
@@ -55,7 +69,9 @@ class RecipesCubit extends Cubit<RecipesState> {
   Future<void> getRandomRecipes() async {
     emit(RecipesLoading());
     try {
-      randomRecipes = await RecipesServices().fetchRandomRecipes();
+      randomRecipes = await RecipesServices().fetchRandomRecipes(
+        type: "metric",
+      );
       emit(RecipesSuccess());
       // print(randomRecipe);
     } on Exception catch (e) {

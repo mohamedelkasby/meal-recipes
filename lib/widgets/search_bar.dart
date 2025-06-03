@@ -124,6 +124,7 @@ class SearchBarWidget extends StatelessWidget {
                                       BlocProvider.of<SearchCubit>(
                                         context,
                                       ).searchResults[index]["id"],
+                                  type: "metric",
                                 )
                                 .then((value) {
                                   recipedate = value;

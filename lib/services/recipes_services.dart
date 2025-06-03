@@ -13,14 +13,14 @@ class RecipesServices {
   String randomRecipesUrl =
       'https://api.spoonacular.com/recipes/random?number=10&apiKey=$apikey';
 
-  Future<List<RecipesModel>> fetchAllRecipes() async {
+  Future<List<RecipesModel>> fetchAllRecipes({required String type}) async {
     try {
       http.Response response = await http.get(Uri.parse(allRecipesUrl));
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
 
         AllRecipesAtOnesModel allRecipesAtOnesModel =
-            AllRecipesAtOnesModel.fromJson(jsonData);
+            AllRecipesAtOnesModel.fromJson(jsonData, type: type);
         return allRecipesAtOnesModel.recipes;
       } else {
         print('Failed to load recipes${response.statusCode}');
@@ -32,7 +32,7 @@ class RecipesServices {
     }
   }
 
-  Future<List<RecipesModel>> fetchRandomRecipes() async {
+  Future<List<RecipesModel>> fetchRandomRecipes({required String type}) async {
     emptyrecipesList() {
       return [
         RecipesModel(
@@ -60,7 +60,7 @@ class RecipesServices {
         var jsonData = jsonDecode(response.body);
         List<RecipesModel> recipes = [];
         for (var recipe in jsonData['recipes']) {
-          recipes.add(RecipesModel.fromJson(recipe));
+          recipes.add(RecipesModel.fromJson(recipe, type: type));
         }
 
         // RecipesModel recipesModel = RecipesModel.fromJson(
@@ -77,7 +77,10 @@ class RecipesServices {
     }
   }
 
-  Future<RecipesModel> fetchRecipeById({required id}) async {
+  Future<RecipesModel> fetchRecipeById({
+    required id,
+    required String type,
+  }) async {
     try {
       http.Response response = await http.get(
         Uri.parse("$baseUrl$id/information?apiKey=$apikey"),
@@ -85,7 +88,7 @@ class RecipesServices {
       if (response.statusCode == 200) {
         var jsonData = jsonDecode(response.body);
 
-        RecipesModel recipesModel = RecipesModel.fromJson(jsonData);
+        RecipesModel recipesModel = RecipesModel.fromJson(jsonData, type: type);
         return recipesModel;
       } else {
         return RecipesModel(

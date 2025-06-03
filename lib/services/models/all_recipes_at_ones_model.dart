@@ -5,11 +5,11 @@ class AllRecipesAtOnesModel {
 
   AllRecipesAtOnesModel({required this.recipes});
 
-  factory AllRecipesAtOnesModel.fromJson(dynamic json) {
+  factory AllRecipesAtOnesModel.fromJson(dynamic json, {required String type}) {
     List<RecipesModel> allRecipes = [];
 
     for (var recipe in json) {
-      allRecipes.add(RecipesModel.fromJson(recipe));
+      allRecipes.add(RecipesModel.fromJson(recipe, type: type));
     }
     return AllRecipesAtOnesModel(recipes: allRecipes);
   }

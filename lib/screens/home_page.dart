@@ -18,6 +18,10 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    RegExp minExpression = RegExp(r'(\d+)\s*(?=minutes)', caseSensitive: false);
+    Match? matchedTime = minExpression.firstMatch(
+      BlocProvider.of<RecipesCubit>(context).randomRecipes[0].description,
+    );
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -75,6 +79,7 @@ class HomePage extends StatelessWidget {
                                           ),
                                           const Spacer(),
                                           LanguageToggleButton(),
+                                          SizedBox(width: 15),
                                         ],
                                       ),
                                       const SizedBox(height: 25),
@@ -211,7 +216,7 @@ class HomePage extends StatelessWidget {
                                                                             10,
                                                                       ),
                                                                       TranslatableText(
-                                                                        "${BlocProvider.of<RecipesCubit>(context).randomRecipes[0].readyInMinutes} Min",
+                                                                        "${matchedTime?.group(1) ?? BlocProvider.of<RecipesCubit>(context).randomRecipes[0].readyInMinutes} Min",
                                                                         style: TextStyle(
                                                                           color:
                                                                               Colors.white,

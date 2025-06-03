@@ -45,7 +45,10 @@ class BookmarkCubit extends Cubit<BookmarkState> {
         List<RecipesModel> loadedRecipes = [];
         for (String jsonString in savedModelsList) {
           try {
-            RecipesModel recipe = RecipesModel.fromJsonString(jsonString);
+            RecipesModel recipe = RecipesModel.fromJsonString(
+              jsonString,
+              type: "metric",
+            );
             loadedRecipes.add(recipe);
           } catch (e) {
             print('Error parsing recipe JSON: $e');

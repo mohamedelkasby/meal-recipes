@@ -3,15 +3,19 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:html/parser.dart';
+import 'package:http/http.dart';
 import 'package:meals_recipes/extention/colors.dart';
 import 'package:meals_recipes/extention/extentions.dart';
 import 'package:meals_recipes/models/translatable_text.dart';
-import 'package:meals_recipes/services/cubit/connectivity_cubit/connectivity_cubit.dart';
 import 'package:meals_recipes/services/cubit/language/language_cubit.dart';
+import 'package:meals_recipes/services/cubit/recipes_cubit/recipes_cubit.dart';
 import 'package:meals_recipes/services/models/recipes_model.dart';
 import 'package:meals_recipes/widgets/bookmark_button.dart';
 import 'package:meals_recipes/widgets/expandable_text.dart';
 import 'package:meals_recipes/widgets/handle_image_error.dart';
+import 'package:meals_recipes/widgets/icon_with_icon.dart';
+import 'package:meals_recipes/widgets/no_internet_banner.dart';
+import 'package:meals_recipes/widgets/unit_toggle_button.dart';
 
 class RecipeInformation extends StatefulWidget {
   const RecipeInformation({super.key, required this.recipesModel});
@@ -33,6 +37,21 @@ class _RecipeInformationState extends State<RecipeInformation> {
   @override
   Widget build(BuildContext context) {
     final uniqueEquipment = widget.recipesModel.equipment.toSet().toList();
+    RegExp caloriesExpression = RegExp(
+      r'(\d+)\s*(?=calories)',
+      caseSensitive: false,
+    );
+    Match? calories = caloriesExpression.firstMatch(
+      widget.recipesModel.description,
+    );
+    RegExp minutsExpression = RegExp(
+      r'(\d+)\s*(?=minutes)',
+      caseSensitive: false,
+    );
+    Match? minuts = minutsExpression.firstMatch(
+      widget.recipesModel.description,
+    );
+
     return AnnotatedRegion<SystemUiOverlayStyle>(
       value: SystemUiOverlayStyle(
         statusBarColor: Colors.transparent,
@@ -205,39 +224,30 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                       ),
                                       const SizedBox(height: 10),
                                       Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.timer_outlined,
-                                                color: greyColor,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              TranslatableText(
-                                                '${widget.recipesModel.cookingTime} mins',
-                                                style: const TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
+                                          textWithIcon(
+                                            icon: Icon(
+                                              Icons.timer_outlined,
+                                              color: greyColor,
+                                            ),
+                                            text:
+                                                '${minuts?.group(1) ?? widget.recipesModel.readyInMinutes} mins',
                                           ),
-                                          Row(
-                                            children: [
-                                              const SizedBox(width: 20),
-                                              Icon(
-                                                Icons.restaurant_menu,
-                                                color: greyColor,
-                                              ),
-                                              const SizedBox(width: 5),
-                                              TranslatableText(
+                                          textWithIcon(
+                                            icon: Icon(
+                                              Icons.restaurant_menu,
+                                              color: greyColor,
+                                            ),
+                                            text:
                                                 '${widget.recipesModel.servings} servings',
-                                                style: const TextStyle(
-                                                  fontSize: 17,
-                                                  color: Colors.grey,
-                                                ),
-                                              ),
-                                            ],
+                                          ),
+                                          textWithIcon(
+                                            icon: Icon(Icons.abc),
+                                            svgImg: "assets/images/fire.svg",
+                                            text:
+                                                '${calories?.group(1) ?? "NA"} Kcal',
                                           ),
                                         ],
                                       ),
@@ -370,13 +380,21 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                       ),
                                       const SizedBox(height: 20),
 
-                                      TranslatableText(
-                                        "ingredients".capitalizeFirstLetter(),
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          TranslatableText(
+                                            "ingredients"
+                                                .capitalizeFirstLetter(),
+                                            style: const TextStyle(
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                          ),
+                                          UnitToggleButton(),
+                                        ],
                                       ),
                                       ListView.builder(
                                         physics:
@@ -440,27 +458,91 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                                   ),
                                                 ),
                                                 // Right side: Amount and Unit
-                                                Row(
-                                                  children: [
-                                                    Text(
-                                                      "${((double.parse(widget.recipesModel.ingredients[index].amount)) / (widget.recipesModel.servings) * servings).formatted} ",
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                    const SizedBox(width: 5),
-                                                    TranslatableText(
-                                                      widget
-                                                          .recipesModel
-                                                          .ingredients[index]
-                                                          .unit,
-                                                      style: const TextStyle(
-                                                        fontSize: 16,
-                                                        color: Colors.black,
-                                                      ),
-                                                    ),
-                                                  ],
+                                                BlocConsumer<
+                                                  RecipesCubit,
+                                                  RecipesState
+                                                >(
+                                                  listener: (context, state) {},
+                                                  buildWhen:
+                                                      (previous, current) =>
+                                                          current
+                                                              is UnitTypeChanged,
+                                                  builder: (context, state) {
+                                                    RecipesCubit recipeBloc =
+                                                        context
+                                                            .read<
+                                                              RecipesCubit
+                                                            >();
+
+                                                    String amount = "";
+                                                    String unit = "";
+                                                    if (recipeBloc.ismetric) {
+                                                      amount =
+                                                          ((double.parse(
+                                                                    widget
+                                                                        .recipesModel
+                                                                        .ingredients[index]
+                                                                        .metricAmount,
+                                                                  )) /
+                                                                  (widget
+                                                                      .recipesModel
+                                                                      .servings) *
+                                                                  servings)
+                                                              .formatted;
+                                                      unit =
+                                                          widget
+                                                              .recipesModel
+                                                              .ingredients[index]
+                                                              .metricUnit;
+                                                    } else if (recipeBloc
+                                                        .isUS) {
+                                                      amount =
+                                                          ((double.parse(
+                                                                    widget
+                                                                        .recipesModel
+                                                                        .ingredients[index]
+                                                                        .usAmount,
+                                                                  )) /
+                                                                  (widget
+                                                                      .recipesModel
+                                                                      .servings) *
+                                                                  servings)
+                                                              .formatted;
+
+                                                      unit =
+                                                          widget
+                                                              .recipesModel
+                                                              .ingredients[index]
+                                                              .usUnit;
+                                                    }
+                                                    return Row(
+                                                      children: [
+                                                        Text(
+                                                          amount,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontSize: 16,
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                              ),
+                                                        ),
+                                                        const SizedBox(
+                                                          width: 5,
+                                                        ),
+                                                        TranslatableText(
+                                                          unit,
+                                                          style:
+                                                              const TextStyle(
+                                                                fontSize: 16,
+                                                                color:
+                                                                    Colors
+                                                                        .black,
+                                                              ),
+                                                        ),
+                                                      ],
+                                                    );
+                                                  },
                                                 ),
                                               ],
                                             ),
@@ -544,48 +626,7 @@ class _RecipeInformationState extends State<RecipeInformation> {
                       ],
                     ),
                     // No Internet Banner
-                    BlocBuilder<ConnectivityCubit, ConnectivityState>(
-                      builder: (context, connectivityState) {
-                        if (connectivityState is ConnectivityDisconnected) {
-                          return Positioned(
-                            top: MediaQuery.of(context).padding.top,
-                            left: 0,
-                            right: 0,
-                            child: AnimatedContainer(
-                              duration: Duration(milliseconds: 300),
-                              height: 50,
-                              color: Colors.red,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(horizontal: 16),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.wifi_off,
-                                      color: Colors.white,
-                                      size: 20,
-                                    ),
-                                    SizedBox(width: 12),
-                                    Expanded(
-                                      child: TranslatableText(
-                                        "No internet connection",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 14,
-                                          fontVariations: [
-                                            FontVariation('wght', 600),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }
-                        return SizedBox.shrink();
-                      },
-                    ),
+                    noInternetBanner(),
                   ],
                 ),
               ),

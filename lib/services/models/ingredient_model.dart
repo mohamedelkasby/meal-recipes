@@ -2,29 +2,36 @@ import 'dart:convert';
 
 class IngredientModel {
   final String name;
-  final String amount;
-  final String unit;
+  final String usAmount;
+  final String usUnit;
+  final String metricAmount;
+  final String metricUnit;
   final String originalName;
   final String aisle;
   final String image;
 
   IngredientModel({
     required this.name,
-    required this.amount,
-    required this.unit,
+    required this.metricAmount,
+    required this.metricUnit,
+    required this.usAmount,
+    required this.usUnit,
     required this.originalName,
     required this.aisle,
     required this.image,
   });
 
-  factory IngredientModel.fromJson(Map<String, dynamic> json) {
+  factory IngredientModel.fromJson(
+    Map<String, dynamic> json, {
+    required String type,
+  }) {
     // Better null safety and error handling
-    String getAmount() {
+    String getUsAmount() {
       try {
         if (json['measures'] != null &&
-            json['measures']['metric'] != null &&
-            json['measures']['metric']['amount'] != null) {
-          return json['measures']['metric']['amount'].toString();
+            json['measures']["us"] != null &&
+            json['measures']["us"]['amount'] != null) {
+          return json['measures']["us"]['amount'].toString();
         }
         return json['amount']?.toString() ?? '0';
       } catch (e) {
@@ -32,12 +39,38 @@ class IngredientModel {
       }
     }
 
-    String getUnit() {
+    String getMetricAmount() {
       try {
         if (json['measures'] != null &&
-            json['measures']['metric'] != null &&
-            json['measures']['metric']['unitShort'] != null) {
-          return json['measures']['metric']['unitShort'].toString();
+            json['measures']["metric"] != null &&
+            json['measures']["metric"]['amount'] != null) {
+          return json['measures']["metric"]['amount'].toString();
+        }
+        return json['amount']?.toString() ?? '0';
+      } catch (e) {
+        return '0';
+      }
+    }
+
+    String getUsUnit() {
+      try {
+        if (json['measures'] != null &&
+            json['measures']["us"] != null &&
+            json['measures']["us"]['unitShort'] != null) {
+          return json['measures']["us"]['unitShort'].toString();
+        }
+        return json['unit']?.toString() ?? '';
+      } catch (e) {
+        return '';
+      }
+    }
+
+    String getMetricUnit() {
+      try {
+        if (json['measures'] != null &&
+            json['measures']["metric"] != null &&
+            json['measures']["metric"]['unitShort'] != null) {
+          return json['measures']["metric"]['unitShort'].toString();
         }
         return json['unit']?.toString() ?? '';
       } catch (e) {
@@ -47,8 +80,10 @@ class IngredientModel {
 
     return IngredientModel(
       name: json['name']?.toString() ?? '',
-      amount: getAmount(),
-      unit: getUnit(),
+      metricAmount: getMetricAmount(),
+      metricUnit: getMetricUnit(),
+      usAmount: getUsAmount(),
+      usUnit: getUsUnit(),
       originalName:
           json['nameClean']?.toString() ?? json['original']?.toString() ?? '',
       aisle: json['aisle']?.toString() ?? '',
@@ -60,8 +95,10 @@ class IngredientModel {
   Map<String, dynamic> toJson() {
     return {
       "name": name,
-      "amount": amount,
-      "unit": unit,
+      "usAmount": usAmount,
+      "usUnit": usUnit,
+      "metricAmount": metricAmount,
+      "metricUnit": metricUnit,
       "originalName": originalName,
       "aisle": aisle,
       "image": image,
@@ -78,10 +115,11 @@ class IngredientModel {
     if (identical(this, other)) return true;
     return other is IngredientModel &&
         other.name == name &&
-        other.amount == amount &&
-        other.unit == unit;
+        other.metricAmount == metricAmount &&
+        other.metricUnit == metricUnit;
   }
 
   @override
-  int get hashCode => name.hashCode ^ amount.hashCode ^ unit.hashCode;
+  int get hashCode =>
+      name.hashCode ^ metricAmount.hashCode ^ metricUnit.hashCode;
 }
