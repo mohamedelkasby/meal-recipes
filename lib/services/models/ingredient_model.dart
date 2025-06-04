@@ -21,10 +21,7 @@ class IngredientModel {
     required this.image,
   });
 
-  factory IngredientModel.fromJson(
-    Map<String, dynamic> json, {
-    required String type,
-  }) {
+  factory IngredientModel.fromJson(Map<String, dynamic> json) {
     // Better null safety and error handling
     String getUsAmount() {
       try {
@@ -48,6 +45,7 @@ class IngredientModel {
         }
         return json['amount']?.toString() ?? '0';
       } catch (e) {
+        print("the error is this ::::: $e ::::");
         return '0';
       }
     }
@@ -108,6 +106,20 @@ class IngredientModel {
   // Convert to JSON string for SharedPreferences
   String toJsonString() {
     return jsonEncode(toJson());
+  }
+
+  // get the data from the SharedPreferences
+  factory IngredientModel.fromSavedJson(Map<String, dynamic> json) {
+    return IngredientModel(
+      name: json["name"],
+      metricAmount: json["metricAmount"],
+      metricUnit: json["metricUnit"],
+      usAmount: json["usAmount"],
+      usUnit: json["usUnit"],
+      originalName: json["originalName"],
+      aisle: json["aisle"],
+      image: json["image"],
+    );
   }
 
   @override

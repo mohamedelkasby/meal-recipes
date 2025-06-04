@@ -71,7 +71,7 @@ class RecipesModel {
           json['extendedIngredients'] != null
               ? List<IngredientModel>.from(
                 json['extendedIngredients'].map(
-                  (x) => IngredientModel.fromJson(x, type: type),
+                  (x) => IngredientModel.fromJson(x),
                 ),
               )
               : [],
@@ -93,19 +93,13 @@ class RecipesModel {
   }
 
   // Factory constructor for saved data (from SharedPreferences)
-  factory RecipesModel.fromJsonString(
-    String jsonString, {
-    required String type,
-  }) {
+  factory RecipesModel.fromJsonString(String jsonString) {
     final Map<String, dynamic> json = jsonDecode(jsonString);
 
-    return RecipesModel.fromSavedJson(json, type: type);
+    return RecipesModel.fromSavedJson(json);
   }
 
-  factory RecipesModel.fromSavedJson(
-    Map<String, dynamic> json, {
-    required String type,
-  }) {
+  factory RecipesModel.fromSavedJson(Map<String, dynamic> json) {
     return RecipesModel(
       id: json['id'],
       title: json['title'] ?? '',
@@ -117,7 +111,7 @@ class RecipesModel {
       ingredients:
           json['ingredients'] != null
               ? (json['ingredients'] as List)
-                  .map((e) => IngredientModel.fromJson(e, type: type))
+                  .map((e) => IngredientModel.fromSavedJson(e))
                   .toList()
               : [],
       steps:

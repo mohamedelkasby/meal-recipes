@@ -47,7 +47,7 @@ class BookmarkCubit extends Cubit<BookmarkState> {
           try {
             RecipesModel recipe = RecipesModel.fromJsonString(
               jsonString,
-              type: "metric",
+              // type: "metric",
             );
             loadedRecipes.add(recipe);
           } catch (e) {
@@ -83,25 +83,17 @@ class BookmarkCubit extends Cubit<BookmarkState> {
         RecipesModel recipeToSave = dataModel.copyWith(isSaved: true);
         _savedRecipes.add(recipeToSave);
         emit(BookmarkSaved(isSaved: true));
-      }
+        try {
+          List<String> jsonStringList =
+              _savedRecipes.map((recipe) => recipe.toJsonString()).toList();
 
-      // Save to SharedPreferences with error handling
-      try {
-        List<String> jsonStringList =
-            _savedRecipes.map((recipe) => recipe.toJsonString()).toList();
-
-        await prefs.setStringList("saved_model", jsonStringList);
-      } catch (saveError) {
-        print('Error saving to SharedPreferences: $saveError');
-        // Revert the in-memory change if save failed
-        if (wasAlreadySaved) {
-          _savedRecipes.add(dataModel);
-        } else {
-          _savedRecipes.removeWhere((recipe) => recipe.id == dataModel.id);
+          await prefs.setStringList("saved_model", jsonStringList);
+        } catch (saveError) {
+          emit(BookmarkError(error: 'Failed to save bookmark: $saveError'));
+          return;
         }
-        emit(BookmarkError(error: 'Failed to save bookmark: $saveError'));
-        return;
       }
+      // Save to SharedPreferences with error handling
 
       // Emit final state
       if (_savedRecipes.isEmpty) {
@@ -111,27 +103,6 @@ class BookmarkCubit extends Cubit<BookmarkState> {
       }
     } catch (e) {
       print('Error in toggleSave: $e');
-      emit(BookmarkError(error: e.toString()));
-    }
-  }
-
-  Future<void> removeRecipe(RecipesModel recipe) async {
-    try {
-      _savedRecipes.removeWhere((r) => r.id == recipe.id);
-
-      final prefs = await SharedPreferences.getInstance();
-      List<String> jsonStringList =
-          _savedRecipes.map((recipe) => recipe.toJsonString()).toList();
-
-      await prefs.setStringList("saved_model", jsonStringList);
-
-      if (_savedRecipes.isEmpty) {
-        emit(BookmarkEmpty(isEmpty: true));
-      } else {
-        emit(BookmarkLoaded(recipes: List.from(_savedRecipes)));
-      }
-    } catch (e) {
-      print('Error removing recipe: $e');
       emit(BookmarkError(error: e.toString()));
     }
   }
