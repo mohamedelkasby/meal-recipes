@@ -222,33 +222,36 @@ class _RecipeInformationState extends State<RecipeInformation> {
                                         ),
                                       ),
                                       const SizedBox(height: 10),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          textWithIcon(
-                                            icon: Icon(
-                                              Icons.timer_outlined,
-                                              color: greyColor,
+                                      SingleChildScrollView(
+                                        scrollDirection: Axis.horizontal,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            textWithIcon(
+                                              icon: Icon(
+                                                Icons.timer_outlined,
+                                                color: greyColor,
+                                              ),
+                                              text:
+                                                  '${minuts?.group(1) ?? widget.recipesModel.readyInMinutes} mins',
                                             ),
-                                            text:
-                                                '${minuts?.group(1) ?? widget.recipesModel.readyInMinutes} mins',
-                                          ),
-                                          textWithIcon(
-                                            icon: Icon(
-                                              Icons.restaurant_menu,
-                                              color: greyColor,
+                                            textWithIcon(
+                                              icon: Icon(
+                                                Icons.restaurant_menu,
+                                                color: greyColor,
+                                              ),
+                                              text:
+                                                  '${widget.recipesModel.servings} servings',
                                             ),
-                                            text:
-                                                '${widget.recipesModel.servings} servings',
-                                          ),
-                                          textWithIcon(
-                                            icon: Icon(Icons.abc),
-                                            svgImg: "assets/images/fire.svg",
-                                            text:
-                                                '${calories?.group(1) ?? "NA"} Kcal',
-                                          ),
-                                        ],
+                                            textWithIcon(
+                                              icon: Icon(Icons.abc),
+                                              svgImg: "assets/images/fire.svg",
+                                              text:
+                                                  '${calories?.group(1) ?? "NA"} Kcal',
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                       const SizedBox(height: 15),
                                       widget.recipesModel.diets.isNotEmpty

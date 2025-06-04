@@ -122,6 +122,7 @@ class LanguageCubit extends Cubit<LanguageState> {
     'tsps': 'ملاعق صغيرة',
     'tsp': 'ملعقة صغيرة',
     'tbsp': 'ملعقة كبيرة',
+    'tbs': 'ملعقة كبيرة',
     'tbsps': 'ملاعق كبيرة',
     'cup': 'كوب',
     'cups': 'أكواب',
@@ -140,6 +141,8 @@ class LanguageCubit extends Cubit<LanguageState> {
     'slices': 'شرائح',
     'piece': 'قطعة',
     'pieces': 'قطع',
+    'kcal': "سعره حراريه",
+    'servings': 'حصص',
   };
 
   Future<String> translateForSearch(String searchText) async {

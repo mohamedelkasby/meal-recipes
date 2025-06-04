@@ -7,6 +7,8 @@ Row textWithIcon({
   required String text,
   String svgImg = "",
 }) {
+  List<String> textOnly = text.split(" ");
+
   return Row(
     children: [
       svgImg == ""
@@ -17,8 +19,12 @@ Row textWithIcon({
           ),
 
       const SizedBox(width: 5),
+      Text(
+        "${textOnly.first} ",
+        style: const TextStyle(fontSize: 17, color: Colors.grey),
+      ),
       TranslatableText(
-        text,
+        textOnly.last,
         style: const TextStyle(fontSize: 17, color: Colors.grey),
       ),
     ],
